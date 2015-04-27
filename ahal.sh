@@ -20,11 +20,11 @@ sudo zypper ref -f ; sudo zypper -n dup
 
 if repo_is_set "$EXTRA_REPO"; then
   minfo "Add remote extra repo"
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu ar extra-$DEVICE $EXTRA_REPO
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar extra-$DEVICE $EXTRA_REPO
 fi
 if repo_is_set "$MW_REPO"; then
   minfo "Add remote mw repo"
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu ar mw-$DEVICE-hal $MW_REPO
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar mw-$DEVICE-hal $MW_REPO
 fi
 
 if [[ ! -d rpm/dhd ]]; then 

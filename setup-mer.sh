@@ -10,7 +10,7 @@ mkdir -p "$MER_ROOT/sdks/sdk"
 mchapter "4.2"
 cd "$MER_ROOT"
 minfo "setup mer"
-TARBALL=mer-i486-latest-sdk-rolling-chroot-armv7hl-sb2.tar.bz2
+TARBALL=mer-i486-latest-sdk-rolling-chroot-${ARCH}-sb2.tar.bz2
 [ -f $TARBALL  ] || curl -k -O https://img.merproject.org/images/mer-sdk/$TARBALL || die
 
 minfo "untar mer"

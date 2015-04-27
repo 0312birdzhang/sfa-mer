@@ -14,7 +14,7 @@ source ~/.hadk.env
 minfo "sb2 setup"
 cd "$MER_ROOT"
 
-SFFE_SB2_TARGET="$MER_ROOT/targets/$VENDOR-$DEVICE-armv7hl"
+SFFE_SB2_TARGET="$MER_ROOT/targets/$VENDOR-$DEVICE-$ARCH"
 
 if [ -d "$SFFE_SB2_TARGET" ]; then
    minfo "SB2_TARGET $SFFE_SB2_TARGET exists, skipping creation"
@@ -24,9 +24,9 @@ fi
 TARGETS_URL=http://releases.sailfishos.org/sdk/latest/targets/targets.json
 if [ -z "$TARGET" ]; then
     minfo "No target specified, assuming latest."
-    TARBALL_URL=$(curl $TARGETS_URL | grep 'armv7hl.tar.bz2' | cut -d\" -f4 | sort | tail -n1)
+    TARBALL_URL=$(curl $TARGETS_URL | grep '${ARCH}.tar.bz2' | cut -d\" -f4 | sort | tail -n1)
 else
-    TARBALL_URL=$(curl $TARGETS_URL | grep 'armv7hl.tar.bz2' | grep $TARGET | cut -d\" -f4)
+    TARBALL_URL=$(curl $TARGETS_URL | grep '${ARCH}.tar.bz2' | grep $TARGET | cut -d\" -f4)
 fi
 TARBALL=$(basename $TARBALL_URL)
 
@@ -50,16 +50,16 @@ cd $SFFE_SB2_TARGET
 grep :$(id -u): etc/passwd || grep :$(id -u): /etc/passwd >> etc/passwd
 grep :$(id -g): etc/group  || grep :$(id -g): /etc/group  >> etc/group
 
-if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-armv7hl" ] ; then
+if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-$ARCH" ] ; then
     minfo "calling sb2-init... " 
     sb2-init -d -L "--sysroot=/" -C "--sysroot=/" \
 	-c /usr/bin/qemu-arm-dynamic -m sdk-build \
-	-n -N -t / $VENDOR-$DEVICE-armv7hl \
-	/opt/cross/bin/armv7hl-meego-linux-gnueabi-gcc || die
-    sb2 -t $VENDOR-$DEVICE-armv7hl -m sdk-install -R rpm --rebuilddb || die
-    sb2 -t $VENDOR-$DEVICE-armv7hl -m sdk-install -R zypper ar \
-        -G http://repo.merproject.org/releases/mer-tools/rolling/builds/armv7hl/packages/ mer-tools-rolling || die
-    sb2 -t $VENDOR-$DEVICE-armv7hl -m sdk-install -R zypper ref --force || die
+	-n -N -t / $VENDOR-$DEVICE-$ARCH \
+	/opt/cross/bin/${ARCH}-meego-linux-gnueabi-gcc || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R rpm --rebuilddb || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ar \
+        -G http://repo.merproject.org/releases/mer-tools/rolling/builds/$ARCH/packages/ mer-tools-rolling || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ref --force || die
 fi
 
 mkdir -p "$MER_ROOT/tmp"
@@ -75,6 +75,6 @@ int main(void) {
 }
 EOF
 
-sb2 -t $VENDOR-$DEVICE-armv7hl gcc main.c -o test || die "can't compile"
-sb2 -t $VENDOR-$DEVICE-armv7hl ./test || die "can't run"
+sb2 -t $VENDOR-$DEVICE-$ARCH gcc main.c -o test || die "can't compile"
+sb2 -t $VENDOR-$DEVICE-$ARCH ./test || die "can't run"
 minfo "done sb2 setup"

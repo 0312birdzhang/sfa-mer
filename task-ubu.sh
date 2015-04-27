@@ -36,17 +36,6 @@ if repo_is_unset "$DHD_REPO"; then
 
   cd "$ANDROID_ROOT"
 
-  DEVICE_CONFIG="$TOOLDIR/device/$VENDOR/manifest.xml"
-  if [ -f $DEVICE_CONFIG ]; then
-     minfo "Injecting manifest $DEVICE_CONFIG"
-     mkdir -p .repo/local_manifests
-     cp ${DEVICE_CONFIG} .repo/local_manifests/
-  else
-     mwarn "No manifest for device $DEVICE found, build might not work"
-     minfo "In order to allow this script to inject a manifest, deposit"
-     minfo "it as $DEVICE_CONFIG"
-  fi
-  unset DEVICE_CONFIG
 #
   minfo "repo sync -j $JOBS -c &> repo-sync.stdoe"
   repo sync  -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
@@ -74,6 +63,19 @@ unset DEVICE_SETUP_SCRIPT
   source build/envsetup.sh
   export USE_CCACHE=1
   breakfast $DEVICE
+
+  rm -f .repo/local_manifests/roomservice.xml
+  DEVICE_CONFIG="$TOOLDIR/device/$VENDOR/manifest.xml"
+  if [ -f $DEVICE_CONFIG ]; then
+     minfo "Injecting manifest $DEVICE_CONFIG"
+     mkdir -p .repo/local_manifests
+     cp ${DEVICE_CONFIG} .repo/local_manifests/
+  else
+     mwarn "No manifest for device $DEVICE found, build might not work"
+     minfo "In order to allow this script to inject a manifest, deposit"
+     minfo "it as $DEVICE_CONFIG"
+  fi
+  unset DEVICE_CONFIG
 
   ######################################
  # mtodo "Find better solution:"

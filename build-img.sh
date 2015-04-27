@@ -16,8 +16,8 @@ cd $ANDROID_ROOT
 
 mkdir -p $ANDROID_ROOT/droid-local-repo/$DEVICE || die
 createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE || die
-sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref || die
-sb2 -t $VENDOR-$DEVICE-armv7hl ssu lr || die
+sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref || die
+sb2 -t $VENDOR-$DEVICE-$ARCH ssu lr || die
 
 mchapter "8.2"
 mkdir -p tmp
@@ -26,7 +26,7 @@ KSFL=$ANDROID_ROOT/tmp/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks
 minfo "Adaptation"
 HA_REPO="repo --name=adaptation0-$DEVICE-@RELEASE@"
 if repo_is_set "$MW_REPO"; then
-   sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install cat /usr/share/kickstarts/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks > $KSFL || die
+   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install cat /usr/share/kickstarts/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks > $KSFL || die
    sed -i -e "s|^$HA_REPO.*$|$HA_REPO --baseurl=file://$ANDROID_ROOT/droid-local-repo/$DEVICE|" $KSFL
 else 
    sed -e "s|^$HA_REPO.*$|$HA_REPO --baseurl=file://$ANDROID_ROOT/droid-local-repo/$DEVICE|" \
@@ -101,8 +101,8 @@ minfo "create mic"
 #RELEASE=latest
 # WARNING: EXTRA_NAME currently does not support '.' dots in it!
 EXTRA_NAME=-${EXTRA_STRING}-$(date +%Y%m%d%H%M)
-sudo mic create fs --arch armv7hl \
-  --tokenmap=ARCH:armv7hl,RELEASE:$RELEASE,EXTRA_NAME:$EXTRA_NAME \
+sudo mic create fs --arch $ARCH \
+  --tokenmap=ARCH:$ARCH,RELEASE:$RELEASE,EXTRA_NAME:$EXTRA_NAME \
   --record-pkgs=name,url \
   --outdir=sfa-$DEVICE-$RELEASE$EXTRA_NAME \
   --pack-to=sfa-$DEVICE-$RELEASE$EXTRA_NAME.tar.bz2 \
@@ -115,16 +115,16 @@ cp -av sfa-${DEVICE}-${RELEASE}${EXTRA_NAME}/sailfishos-${DEVICE}-release-${RELE
 minfo "Info: clean repos in target"
 
 if repo_is_set "$MW_REPO"; then
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu rr mw-$DEVICE-hal
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu rr mw-$DEVICE-hal
 fi
 if repo_is_set "$EXTRA_REPO"; then
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu rr extra-$DEVICE
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu rr extra-$DEVICE
 fi
 if repo_is_set "$DHD_REPO"; then
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu rr dhd-$DEVICE-hal
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu rr dhd-$DEVICE-hal
 fi
-sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu rr local-$DEVICE-hal
-sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install zypper ref -f
-sb2 -t $VENDOR-$DEVICE-armv7hl -R -m sdk-install ssu lr
+sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu rr local-$DEVICE-hal
+sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper ref -f
+sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu lr
 
  
