@@ -47,11 +47,11 @@ if repo_is_unset "$DHD_REPO"; then
      minfo "it as $DEVICE_CONFIG"
   fi
   unset DEVICE_CONFIG
-
+#
   minfo "repo sync -j $JOBS -c &> repo-sync.stdoe"
   repo sync  -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
   minfo "done repo sync -c &> repo-sync.stdoe"
-
+#
   mchapter "5.2"
   minfo "build env, cache and breackfast "
   if [ -f .repo/local_manifests/roomservice.xml ]; then
@@ -113,13 +113,13 @@ unset DEVICE_SETUP_SCRIPT
   popd  
   make libc_common &> make-libc_common.stdoe
   make libc &> make-libc.stdoe
-#### camera bits
+##### camera bits
   minfo "Do some magic for camera"
-  pushd external/droidmedia
-  git reset --hard 0f8689d5203f004d234ce8b73c6068f7eb01b559
+#  pushd external/droidmedia
+#  git reset --hard 0f8689d5203f004d234ce8b73c6068f7eb01b559
   # first bad commit bb963dba657467d53a280ac45347a51ac6fc6dd0 
   # last known working  0f8689d5203f004d234ce8b73c6068f7eb01b559
-  popd
+ # popd
   make -j$JOBS libdroidmedia >& make-libdroidmedia.log
   make -j$JOBS minimediaservice >& make-minimediaservice.log
   make -j$JOBS minisfservice >& make-minisfservice.log

@@ -51,8 +51,8 @@ fi
 
 minfo "extra packages"
 # Not sure about them, yet... maybe include an external per-device file
-PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar mce-plugin-libhybris strace jolla-devicelock-plugin-encsfa sailfish-version"
-
+PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar mce-plugin-libhybris strace"
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid harbour-cameraplus sailfish-weather "
 # jolla-fileman is no longer available starting update13. Download "File Manager" from store instead.
 # Add it only to older versions (iirc it never worked anyway as per NEMO#796)
 if [[ $(zypper vcmp $RELEASE 1.1.4.28) == *"is older"* ]]; then
@@ -66,7 +66,7 @@ for pack in $PACKAGES_TO_ADD; do
 done
 
 #PACKAGES_TO_REMOVE="ofono-configs-mer ssu-vendor-data-example qtscenegraph-adaptation "
-#PACKAGES_TO_REMOVE="ofono-configs-mer ssu-vendor-data-example"
+PACKAGES_TO_REMOVE="jolla-camera jolla-camera-settings"
 for pack in $PACKAGES_TO_REMOVE; do
   sed -i "/@Jolla\ Configuration\ $DEVICE/a -$pack" $KSFL
 done
@@ -85,6 +85,7 @@ fi
 if repo_is_set "$DHD_REPO"; then
   sed -i "/begin 60_ssu/a ssu ar dhd $DHD_REPO" $KSFL
 fi
+sed -i "/begin 60_ssu/a zypper rm jolla-camera jolla-camera-settings" $KSFL
 sed -i "/begin 60_ssu/a ssu dr adaptation0" $KSFL
 
 mchapter "8.3"
