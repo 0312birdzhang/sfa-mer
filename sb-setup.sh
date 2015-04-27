@@ -24,9 +24,9 @@ fi
 TARGETS_URL=http://releases.sailfishos.org/sdk/latest/targets/targets.json
 if [ -z "$TARGET" ]; then
     minfo "No target specified, assuming latest."
-    TARBALL_URL=$(curl $TARGETS_URL | grep '${ARCH}.tar.bz2' | cut -d\" -f4 | sort | tail -n1)
+    TARBALL_URL=$(curl $TARGETS_URL | grep "${ARCH}.tar.bz2" | cut -d\" -f4 | sort | tail -n1)
 else
-    TARBALL_URL=$(curl $TARGETS_URL | grep '${ARCH}.tar.bz2' | grep $TARGET | cut -d\" -f4)
+    TARBALL_URL=$(curl $TARGETS_URL | grep "${ARCH}.tar.bz2" | grep $TARGET | cut -d\" -f4)
 fi
 TARBALL=$(basename $TARBALL_URL)
 

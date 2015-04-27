@@ -168,7 +168,7 @@ export DHD_REPO=\"\${DHD_REPO:-$DHD_REPO}\"
 export MW_REPO=\"\${MW_REPO:-$MW_REPO}\"
 export EXTRA_REPO=\"\${EXTRA_REPO:-$EXTRA_REPO}\"
 export TARGET=\"\${TARGET:-$TARGET}\"
-export ARCH=\"\${TARGET:-$ARCH}\"
+export ARCH=\"\${ARCH:-$ARCH}\"
 
 
 # printf \"vars in use:
