@@ -39,4 +39,5 @@ if [[ ! -d rpm/dhd ]]; then
     fi  
     hybris/dhd2modular/dhd2modular.sh migrate 2>&1 | tee $ANDROID_ROOT/dhd.migrate.log
 fi
+mkdir -p droid-local-repo/hammerhead
 rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
