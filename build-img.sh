@@ -47,11 +47,12 @@ if repo_is_set "$EXTRA_REPO"; then
     minfo "add mw repo"
     HA_REPO3="repo --name=extra-$DEVICE-@RELEASE@ --baseurl=${EXTRA_REPO}"
     sed -i -e "/^$HA_REPO.*$/a$HA_REPO3" $KSFL
+    sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation=.*$|adaptation=${EXTRA_REPO}|' /usr/share/ssu/repos.ini" $KSFL
 fi
 
 minfo "extra packages"
 # Not sure about them, yet... maybe include an external per-device file
-PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar mce-plugin-libhybris strace"
+PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar strace"
 PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid harbour-cameraplus sailfish-weather "
 # jolla-fileman is no longer available starting update13. Download "File Manager" from store instead.
 # Add it only to older versions (iirc it never worked anyway as per NEMO#796)
