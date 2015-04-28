@@ -34,7 +34,7 @@ if [[ ! -d rpm/dhd ]]; then
         popd
     else
         pushd hybris
-        git clone git@github.com:sledges/dhd2modular.git
+        git clone https://github.com/mer-hybris/dhd2modular
         popd
     fi  
     hybris/dhd2modular/dhd2modular.sh migrate 2>&1 | tee $ANDROID_ROOT/dhd.migrate.log

@@ -130,7 +130,8 @@ else  # DHD_REPO"
   if [ ! -d "$ANDROID_ROOT" ]; then
      mkdir -p "$ANDROID_ROOT"
      pushd "$ANDROID_ROOT"
-      git clone git://github.com/mer-hybris/droid-hal-device rpm || die
+     #git clone git://github.com/mer-hybris/droid-hal-device rpm || die
+     git clone https://github.com/mer-hybris/droid-hal-device -b hybris-10.1 rpm || die  
      popd
  else
      pushd "$ANDROID_ROOT"/rpm
