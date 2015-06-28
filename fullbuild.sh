@@ -114,10 +114,11 @@ while (($#)); do
   ;;
   -arch)
     shift
-    TARGET=$1
+    ARCH=$1
     shift
   ;;
   *)
+    echo "$1"
     echo "unknown option! Use -h for the list of options!"
     exit 0
   ;;

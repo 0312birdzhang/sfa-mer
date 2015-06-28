@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project path="device/lge/hammerhead" name="mer-hybris/android_device_lge_hammerhead" revision="hybris-11.0-44S" />
+  <project path="kernel/lge/hammerhead" name="mer-hybris/android_kernel_lge_hammerhead" revision="hybris-11.0" />
+  <project path="hybris/droid-hal-version-hammerhead" name="mer-hybris/droid-hal-version-hammerhead" revision="master" />
+  <project path="hybris/droid-configs" name="mer-hybris/droid-config-hammerhead" revision="master" />
+  <project path="rpm" name="mer-hybris/droid-hal-hammerhead" revision="master" />
+</manifest>

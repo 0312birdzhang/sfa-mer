@@ -26,7 +26,13 @@ if repo_is_set "$MW_REPO"; then
   minfo "Add remote mw repo"
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar mw-$DEVICE-hal $MW_REPO
 fi
-
+if repo_is_set "$DHD_REPO"; then
+  minfo "Add remote dhd repo"
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar dhd-$DEVICE-hal $DHD_REPO
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper clean -a 
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper ref -f
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper -n install droid-config-hammerhead-ssu-kickstarts
+else
 if [[ ! -d rpm/dhd ]]; then 
     if [[ -d hybris/dhd2modular ]] ; then 
         pushd hybris/dhd2modular
@@ -41,3 +47,4 @@ if [[ ! -d rpm/dhd ]]; then
 fi
 mkdir -p droid-local-repo/$DEVICE
 rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
+fi

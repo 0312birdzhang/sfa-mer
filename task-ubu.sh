@@ -32,13 +32,25 @@ if repo_is_unset "$DHD_REPO"; then
      mkdir -p "$ANDROID_ROOT"
      cd "$ANDROID_ROOT"
      repo init -u git://github.com/mer-hybris/android.git -b $BRANCH || die
+     #repo init -u https://github.com/sledges/android -b nemo829 || die
   fi
-
+  
   cd "$ANDROID_ROOT"
-
 #
+  rm -f .repo/local_manifests/roomservice.xml
+  DEVICE_CONFIG="$TOOLDIR/device/$VENDOR/$DEVICE-modular.xml"
+  if [ -f $DEVICE_CONFIG ]; then
+     minfo "Injecting manifest $DEVICE_CONFIG"
+     mkdir -p local_manifest
+     cp ${DEVICE_CONFIG} local_manifest/
+  else
+     mwarn "No manifest for device $DEVICE found, build might not work"
+     minfo "In order to allow this script to inject a manifest, deposit"
+     minfo "it as $DEVICE_CONFIG"
+  fi
+  unset DEVICE_CONFIG
   minfo "repo sync -j $JOBS -c &> repo-sync.stdoe"
-  repo sync  -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
+  repo sync --fetch-submodules -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
   minfo "done repo sync -c &> repo-sync.stdoe"
 #
   mchapter "5.2"
@@ -64,18 +76,6 @@ unset DEVICE_SETUP_SCRIPT
   export USE_CCACHE=1
   breakfast $DEVICE
 
-  rm -f .repo/local_manifests/roomservice.xml
-  DEVICE_CONFIG="$TOOLDIR/device/$VENDOR/manifest.xml"
-  if [ -f $DEVICE_CONFIG ]; then
-     minfo "Injecting manifest $DEVICE_CONFIG"
-     mkdir -p .repo/local_manifests
-     cp ${DEVICE_CONFIG} .repo/local_manifests/
-  else
-     mwarn "No manifest for device $DEVICE found, build might not work"
-     minfo "In order to allow this script to inject a manifest, deposit"
-     minfo "it as $DEVICE_CONFIG"
-  fi
-  unset DEVICE_CONFIG
 
   ######################################
  # mtodo "Find better solution:"

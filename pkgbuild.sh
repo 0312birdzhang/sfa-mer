@@ -50,6 +50,7 @@ minfo "Building successful, adding packages to repo"
 mkdir -p "$ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG" >>$LOG 2>&1|| die_with_log "$LOG"
 rm -f "$ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG/"*.rpm >>$LOG 2>&1|| die_with_log "$LOG"
 mv RPMS/*.rpm "$ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG" >>$LOG 2>&1|| die_with_log "$LOG"
+ls $ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG
 createrepo "$ANDROID_ROOT/droid-local-repo/$DEVICE" >>$LOG 2>&1|| die_with_log "$LOG" "can't create repo"
 sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref >>$LOG 2>&1|| die_with_log "$LOG" "can't update pkg info"
 
