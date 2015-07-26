@@ -10,17 +10,17 @@ source "$TOOLDIR/utility-functions.inc"
 [ -z "$MERSDK" ] && exit 0
 
 source ~/.hadk.env
-
+[[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
 minfo "sb2 setup"
 cd "$MER_ROOT"
 
 SFFE_SB2_TARGET="$MER_ROOT/targets/$VENDOR-$DEVICE-$ARCH"
-
+rm -rf $SFFE_SB2_TARGET
 if [ -d "$SFFE_SB2_TARGET" ]; then
    minfo "SB2_TARGET $SFFE_SB2_TARGET exists, skipping creation"
    exit 0
 fi
-
+echo "TARGER=$TARGET"
 TARGETS_URL=http://releases.sailfishos.org/sdk/latest/targets/targets.json
 if [ -z "$TARGET" ]; then
     minfo "No target specified, assuming latest."
@@ -31,12 +31,13 @@ fi
 TARBALL=$(basename $TARBALL_URL)
 
 mkdir -p $SFFE_SB2_TARGET
- 
+#TARBALL=Jolla-1.1.7.24-Sailfish_SDK_Target-armv7hl.tar.bz2
 if [ -f $TARBALL ] ; then
    minfo "using existing tarball $TARBALL ..."
 else
    minfo "getting tarball $TARBALL ..."
    curl -O $TARBALL_URL || die
+#    cp ~/Downloads/Jolla-1.1.7.24-Sailfish_SDK_Target-armv7hl.tar.bz2 .
 fi
 
 minfo "untaring ..."
@@ -45,11 +46,10 @@ mv ~/.scratchbox2{,-$(date +%d-%m-%Y.%H-%M-%S)}
 
 minfo "chown $SFFE_SB2_TARGET to user"
 [ $(stat -c %u $SFFE_SB2_TARGET ) == $(id -u) ] || sudo chown -R $USER $SFFE_SB2_TARGET
-
+set -x
 cd $SFFE_SB2_TARGET
 grep :$(id -u): etc/passwd || grep :$(id -u): /etc/passwd >> etc/passwd
 grep :$(id -g): etc/group  || grep :$(id -g): /etc/group  >> etc/group
-
 if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-$ARCH" ] ; then
     minfo "calling sb2-init... " 
     sb2-init -d -L "--sysroot=/" -C "--sysroot=/" \
@@ -59,7 +59,9 @@ if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-$ARCH" ] ; then
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R rpm --rebuilddb || die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ar \
         -G http://repo.merproject.org/releases/mer-tools/rolling/builds/$ARCH/packages/ mer-tools-rolling || die
-    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ref --force || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R ssu re $RELEASE || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  ref --force|| die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  dup|| die
 fi
 
 mkdir -p "$MER_ROOT/tmp"

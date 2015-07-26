@@ -13,11 +13,17 @@ source ~/.hadk.env
 
 [ -z "$MERSDKUBU" ] && "$TOOLDIR"/exec-mer.sh ubu-chroot -r "$MER_ROOT/sdks/ubuntu" $0
 [ -z "$MERSDKUBU" ] && exit 0
+[[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+[[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
 
 # install software in chroot
 minfo "install additional tools for ubuntu chroot"
-sudo apt-get install -y unzip bsdmainutils
+sudo $proxy apt-get install -y unzip bsdmainutils
 
+# export http_proxy=http://wwwcache.dl.ac.uk:8080
+# export https_proxy=$http_proxy
+# export ftp_proxy=$http_proxy
+# export rsync_proxy=$http_proxy
 mkdir -p ~/bin
 [ -f ~/bin/repo ] || curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
@@ -49,6 +55,16 @@ if repo_is_unset "$DHD_REPO"; then
      minfo "it as $DEVICE_CONFIG"
   fi
   unset DEVICE_CONFIG
+  DEVICE_SETUP_SCRIPT="$TOOLDIR/device/$VENDOR/$DEVICE-hal-build-setup.sh"
+  if [ -f $DEVICE_SETUP_SCRIPT ]; then
+    minfo "Calling hal build setup script $DEVICE_SETUP_SCRIPT"
+    bash ${DEVICE_SETUP_SCRIPT}
+  else
+    mwarn "No hal build setup script for your $DEVICE found, build might not work"
+    minfo "Place all the commands you need to run, befor building hybris-hal"
+    minfo "into the file $DEVICE_SETUP_SCRIPT"
+  fi
+  unset DEVICE_SETUP_SCRIPT
   minfo "repo sync -j $JOBS -c &> repo-sync.stdoe"
   repo sync --fetch-submodules -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
   minfo "done repo sync -c &> repo-sync.stdoe"
@@ -59,17 +75,6 @@ if repo_is_unset "$DHD_REPO"; then
      minfo "Remove room service"
      rm -f .repo/local_manifests/roomservice.xml
   fi
-
-DEVICE_SETUP_SCRIPT="$TOOLDIR/device/$VENDOR/$DEVICE-hal-build-setup.sh"
-if [ -f $DEVICE_SETUP_SCRIPT ]; then
-  minfo "Calling hal build setup script $DEVICE_SETUP_SCRIPT"
-  bash ${DEVICE_SETUP_SCRIPT}
-else
-  mwarn "No hal build setup script for your $DEVICE found, build might not work"
-  minfo "Place all the commands you need to run, befor building hybris-hal"
-  minfo "into the file $DEVICE_SETUP_SCRIPT"
-fi
-unset DEVICE_SETUP_SCRIPT
 
 
   source build/envsetup.sh
@@ -97,7 +102,13 @@ unset DEVICE_SETUP_SCRIPT
   ######################################
 
   minfo "make -j$JOBS hybris-hal &> make-hybris-hal.stdoe "
-
+ # rm -rf bionic
+ # git clone https://github.com/mer-hybris/android_bionic/ bionic
+ # pushd bionic
+ #   git checkout hybris-11.0-44S
+ #   git cherry-pick ee676296
+ # popd
+ # cp  ../ubu-July-t15/bionic/libc/bionic/system_properties.c bionic/libc/bionic/system_properties.c 
   make -j$JOBS hybris-hal &> make-hybris-hal.stdoe || die_with_log make-hybris-hal.stdoe
 
   CREDITS="$TOOLDIR/device/$VENDOR/$DEVICE-hal-build-credits.inc"
@@ -107,21 +118,16 @@ unset DEVICE_SETUP_SCRIPT
      source ${CREDITS}
   fi
   minfo "Do some magic for sensors"
-  rm -rf bionic
-  git clone https://github.com/mer-hybris/android_bionic/ bionic
-  pushd bionic
-  git checkout hybris-11.0-44S
-  git cherry-pick 40eb3772fecf40bf89d70b30f57fb0e074301d3a
-  popd  
-  make libc_common &> make-libc_common.stdoe
-  make libc &> make-libc.stdoe
+#  rm -rf bionic
+#  git clone https://github.com/mer-hybris/android_bionic/ bionic
+#  pushd bionic
+#  git checkout hybris-11.0-44S
+#  git cherry-pick 40eb3772fecf40bf89d70b30f57fb0e074301d3a
+#  popd  
+#  make libc_common &> make-libc_common.stdoe
+#  make libc &> make-libc.stdoe
 ##### camera bits
   minfo "Do some magic for camera"
-#  pushd external/droidmedia
-#  git reset --hard 0f8689d5203f004d234ce8b73c6068f7eb01b559
-  # first bad commit bb963dba657467d53a280ac45347a51ac6fc6dd0 
-  # last known working  0f8689d5203f004d234ce8b73c6068f7eb01b559
- # popd
   make -j$JOBS libdroidmedia >& make-libdroidmedia.log
   make -j$JOBS minimediaservice >& make-minimediaservice.log
   make -j$JOBS minisfservice >& make-minisfservice.log

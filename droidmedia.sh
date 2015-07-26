@@ -9,6 +9,8 @@
 
 source ~/.hadk.env
 
+cp pack-source.sh $ANDROID_ROOT/
+cp droidmedia.spec $ANDROID_ROOT/external/droidmedia/rpm/
 cd $ANDROID_ROOT
 sh pack-source.sh
 

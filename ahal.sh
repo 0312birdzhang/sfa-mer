@@ -10,7 +10,7 @@ source "$TOOLDIR/utility-functions.inc"
 [ -z "$MERSDK" ] && exit 0
 
 source ~/.hadk.env
-
+source ~/lavello/sfa-mer/proxy
 cd $ANDROID_ROOT
 
 mchapter "7.1.1"

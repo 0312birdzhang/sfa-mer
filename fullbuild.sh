@@ -197,9 +197,11 @@ export ARCH=\"\${ARCH:-$ARCH}\"
 
 
 # echo $0
-
 mchapter "4.1"
 cp ${TOOLDIR}/profile-mer ~/.mersdk.profile
+[[ -f $TOOLDIR/proxy ]] && echo "source $TOOLDIR/proxy" >> ~/.mersdk.profile
+[[ -f $TOOLDIR/proxy ]] && echo "alias sudo=\"sudo http_proxy=\$http_proxy\"" >> ~/.mersdk.profile
+
 cp ${TOOLDIR}/profile-ubu ~/.mersdkubu.profile
 
 ${TOOLDIR}/setup-mer.sh || die

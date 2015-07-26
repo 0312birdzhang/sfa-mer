@@ -1,6 +1,7 @@
 #!/bin/bash
 TOOLDIR="$(dirname $0)"
 source "$TOOLDIR/utility-functions.inc"
+set -x 
 
 # Carries the sequence of steps under the Mer SDK.
 # - Set up Ubuntu for building CyanogenMod.
@@ -11,10 +12,12 @@ source "$TOOLDIR/utility-functions.inc"
 [ -z "$MERSDK" ] && ${TOOLDIR}/exec-mer.sh $0
 [ -z "$MERSDK" ] && exit 0
 
-mchapter "4.3"
-sudo zypper -n install android-tools createrepo zip || die
-
 source ~/.hadk.env
+[[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+[[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
+mchapter "4.3"
+sudo $proxy zypper -n install zip android-tools createrepo || die
+
 minfo "setting up ubuntu chroot"
 UBUNTU_CHROOT="$MER_ROOT/sdks/ubuntu"
 mkdir -p "$UBUNTU_CHROOT"
@@ -23,6 +26,7 @@ mchapter "4.4.1"
 pushd "$MER_ROOT"
 TARBALL=ubuntu-trusty-android-rootfs.tar.bz2
 [ -f $TARBALL  ] || curl -O http://img.merproject.org/images/mer-hybris/ubu/$TARBALL
+set -x
 minfo "untaring ubuntu..."
 [ -f ${TARBALL}.untarred ] || sudo tar --numeric-owner -xjf $TARBALL -C "$UBUNTU_CHROOT" || die
 touch ${TARBALL}.untarred
@@ -44,7 +48,7 @@ minfo "done ubuntu"
 mchapter "6. sb2 setup"
 ./sb-setup.sh || die
 
-./ahal.sh || die
+#./ahal.sh || die
 
-./build-img.sh || die
+#./build-img.sh || die
 

@@ -33,7 +33,8 @@ cd $ANDROID_ROOT
       git pull
     else
       echo -e "\e[01;32m Info: clone the git $PKG\e[00m"
-      git clone https://github.com/foolab/$PKG.git 
+      git clone https://github.com/sailfishos/$PKG.git
+       git clone https://github.com/foolab/$PKG.git 
       #git clone https://github.com/foolab/$PKG.git -b droidmedia
       #git clone https://github.com/foolab/$PKG.git -b caps
       cd $PKG
