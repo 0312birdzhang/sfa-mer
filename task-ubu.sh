@@ -28,11 +28,11 @@ chmod a+x ~/bin/repo
 export PATH=${PATH}:${HOME}/bin
 
 
+mkdir -p "$ANDROID_ROOT"
 if repo_is_unset "$DHD_REPO"; then
   mchapter "5.1"
   if [ ! -f "$ANDROID_ROOT/.repo/manifest.xml" ]; then
      mkdir -p "$ANDROID_ROOT"
-     cd "$ANDROID_ROOT"
      repo init -u git://github.com/mer-hybris/android.git -b $BRANCH || die
   fi
   
@@ -42,8 +42,8 @@ if repo_is_unset "$DHD_REPO"; then
   DEVICE_CONFIG="$TOOLDIR/device/$VENDOR/$DEVICE-modular.xml"
   if [ -f $DEVICE_CONFIG ]; then
      minfo "Injecting manifest $DEVICE_CONFIG"
-     mkdir -p local_manifest
-     cp ${DEVICE_CONFIG} local_manifest/
+     mkdir -p .repo/local_manifests
+     cp ${DEVICE_CONFIG} .repo/local_manifests/
   else
      mwarn "No manifest for device $DEVICE found, build might not work"
      minfo "In order to allow this script to inject a manifest, deposit"

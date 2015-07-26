@@ -14,8 +14,7 @@ source ~/.hadk.env
 [[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
 
 mchapter "5.1 version b"
-if [ ! -d "$ANDROID_ROOT" ]; then
-  mkdir -p "$ANDROID_ROOT"
+if [ ! -d "$ANDROID_ROOT/rpm" ]; then
   pushd "$ANDROID_ROOT"
   modular=$(git ls-remote git://github.com/mer-hybris/droid-hal-$DEVICE | grep "HEAD" | awk '{print $2}')
   if [[ x"$modular" == "xHEAD" ]]; then

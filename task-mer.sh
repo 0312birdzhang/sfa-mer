@@ -1,7 +1,6 @@
 #!/bin/bash
 TOOLDIR="$(dirname $0)"
 source "$TOOLDIR/utility-functions.inc"
-set -x 
 
 # Carries the sequence of steps under the Mer SDK.
 # - Set up Ubuntu for building CyanogenMod.
@@ -48,7 +47,7 @@ minfo "done ubuntu"
 mchapter "6. sb2 setup"
 ./sb-setup.sh || die
 
-#./ahal.sh || die
+./ahal.sh || die
 
-#./build-img.sh || die
+./build-img.sh || die
 

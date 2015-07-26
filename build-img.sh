@@ -11,14 +11,17 @@ source "$TOOLDIR/utility-functions.inc"
 [ -z "$MERSDK" ] && exit 0
 
 source ~/.hadk.env
-source ~/lavello/sfa-mer/proxy
-cd $ANDROID_ROOT
-set -x
-#mkdir -p $ANDROID_ROOT/droid-local-repo/$DEVICE || die
-createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE || die
-sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref || die
-sb2 -t $VENDOR-$DEVICE-$ARCH ssu lr || die
-
+[[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+if repo_is_set "$DHD_REPO"; then
+  cd $ANDROID_ROOT
+  minfo "Let us start!!!"
+else
+  cd $ANDROID_ROOT
+  mkdir -p $ANDROID_ROOT/droid-local-repo/$DEVICE || die
+  createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE || die
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref || die
+  sb2 -t $VENDOR-$DEVICE-$ARCH ssu lr || die
+fi
 mchapter "8.2"
 mkdir -p tmp
 KSFL=$ANDROID_ROOT/tmp/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks
@@ -52,10 +55,10 @@ minfo "extra packages"
 PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar strace"
 PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout sailfish-weather "
 PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid "
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus apkenv"
-#if repo_is_set "$EXTRA_REPO"; then
-#   PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste harbour-poor-maps less sailfish-utilities harbour-sailbusdublin  jolla-ambient-z1.5 ambient-icons-closed-z1.5"
-#fi
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus apkenv geoclue-provider-hybris-community"
+if repo_is_set "$EXTRA_REPO"; then
+   PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste harbour-poor-maps harbour-file-browser less sailfish-utilities jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+fi
 #PACKAGES_TO_ADD="pulseaudio-modules-droid"
 # jolla-fileman is no longer available starting update13. Download "File Manager" from store instead.
 # Add it only to older versions (iirc it never worked anyway as per NEMO#796)
@@ -97,16 +100,19 @@ sed -i "/begin 60_ssu/a ssu dr adaptation0" $KSFL
 #sed -i "s/@Jolla Configuration $DEVICE/droid-config-hammerhead-policy-settings/g" $KSFL
 mchapter "8.3"
 minfo "Info: create patterns"
-[ -d hybris ] || mkdir -p hybris
+if repo_is_set "$DHD_REPO" ; then
+  minfo "nothing to do for patterns"
+else 
  ./hybris/droid-configs/droid-configs-device/helpers/process_patterns.sh || die
-cat $KSFL > ~/a.ks
+fi
 mchapter "8.4"
 minfo "create mic"
 # always aim for the latest:
-RELEASE=1.1.7.24
+#RELEASE=1.1.7.25
 #RELEASE=latest
 # WARNING: EXTRA_NAME currently does not support '.' dots in it!
 EXTRA_NAME=-${EXTRA_STRING}-$(date +%Y%m%d%H%M)
+set -x
 sudo mic create fs --arch $ARCH \
   --tokenmap=ARCH:$ARCH,RELEASE:$RELEASE,EXTRA_NAME:$EXTRA_NAME \
   --record-pkgs=name,url \
