@@ -13,24 +13,29 @@ source ~/.hadk.env
 [[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
 [[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
 
-  mchapter "5.1 version b"
-  if [ ! -d "$ANDROID_ROOT" ]; then
-     mkdir -p "$ANDROID_ROOT/rpm"
-     pushd "$ANDROID_ROOT/rpm"
-     git init
-     git submodule add https://github.com/mer-hybris/droid-hal-device dhd
-     popd
- else
-     pushd "$ANDROID_ROOT/rpm"
-     git pull
-     popd
+mchapter "5.1 version b"
+if [ ! -d "$ANDROID_ROOT" ]; then
+  mkdir -p "$ANDROID_ROOT"
+  pushd "$ANDROID_ROOT"
+  modular=$(git ls-remote git://github.com/mer-hybris/droid-hal-$DEVICE | grep "HEAD" | awk '{print $2}')
+  if [[ x"$modular" == "xHEAD" ]]; then
+    git clone git://github.com/mer-hybris/droid-hal-$DEVICE rpm
+  else
+    git clone git://github.com/mer-hybris/droid-hal-device rpm
   fi
+  popd
+else
+  pushd "$ANDROID_ROOT/rpm"
+  git pull
+  popd
+fi
+
 cd $ANDROID_ROOT
 
 mchapter "7.1.1"
 
 minfo "updating mer sdk"
-sudo zypper ref -f ; sudo zypper -n dup
+sudo $proxy zypper ref -f ; sudo $proxy zypper -n dup
 
 if repo_is_set "$EXTRA_REPO"; then
   minfo "Add remote extra repo"
@@ -47,7 +52,7 @@ if repo_is_set "$DHD_REPO"; then
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper ref -f
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper -n install droid-config-hammerhead-ssu-kickstarts
 else
-if [[ ! -d rpm/dhd ]]; then 
+  if [[ ! -d rpm/dhd ]]; then 
     if [[ -d hybris/dhd2modular ]] ; then 
         pushd hybris/dhd2modular
         git pull 
@@ -58,7 +63,7 @@ if [[ ! -d rpm/dhd ]]; then
         popd
     fi  
     hybris/dhd2modular/dhd2modular.sh migrate 2>&1 | tee $ANDROID_ROOT/dhd.migrate.log
-fi
-mkdir -p droid-local-repo/$DEVICE
-rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
+  fi
+  mkdir -p droid-local-repo/$DEVICE
+  rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
 fi
