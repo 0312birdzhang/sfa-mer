@@ -10,7 +10,21 @@ source "$TOOLDIR/utility-functions.inc"
 [ -z "$MERSDK" ] && exit 0
 
 source ~/.hadk.env
-source ~/lavello/sfa-mer/proxy
+[[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+[[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
+
+  mchapter "5.1 version b"
+  if [ ! -d "$ANDROID_ROOT" ]; then
+     mkdir -p "$ANDROID_ROOT/rpm"
+     pushd "$ANDROID_ROOT/rpm"
+     git init
+     git submodule add https://github.com/mer-hybris/droid-hal-device dhd
+     popd
+ else
+     pushd "$ANDROID_ROOT/rpm"
+     git pull
+     popd
+  fi
 cd $ANDROID_ROOT
 
 mchapter "7.1.1"

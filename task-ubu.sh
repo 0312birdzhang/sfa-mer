@@ -20,10 +20,6 @@ source ~/.hadk.env
 minfo "install additional tools for ubuntu chroot"
 sudo $proxy apt-get install -y unzip bsdmainutils
 
-# export http_proxy=http://wwwcache.dl.ac.uk:8080
-# export https_proxy=$http_proxy
-# export ftp_proxy=$http_proxy
-# export rsync_proxy=$http_proxy
 mkdir -p ~/bin
 [ -f ~/bin/repo ] || curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
@@ -38,7 +34,6 @@ if repo_is_unset "$DHD_REPO"; then
      mkdir -p "$ANDROID_ROOT"
      cd "$ANDROID_ROOT"
      repo init -u git://github.com/mer-hybris/android.git -b $BRANCH || die
-     #repo init -u https://github.com/sledges/android -b nemo829 || die
   fi
   
   cd "$ANDROID_ROOT"
@@ -117,7 +112,7 @@ if repo_is_unset "$DHD_REPO"; then
      minfo "sourcing \"credits\" build script."
      source ${CREDITS}
   fi
-  minfo "Do some magic for sensors"
+#  minfo "Do some magic for sensors"
 #  rm -rf bionic
 #  git clone https://github.com/mer-hybris/android_bionic/ bionic
 #  pushd bionic
@@ -131,17 +126,4 @@ if repo_is_unset "$DHD_REPO"; then
   make -j$JOBS libdroidmedia >& make-libdroidmedia.log
   make -j$JOBS minimediaservice >& make-minimediaservice.log
   make -j$JOBS minisfservice >& make-minisfservice.log
-else  # DHD_REPO"
-  mchapter "5.1 version b"
-  if [ ! -d "$ANDROID_ROOT" ]; then
-     mkdir -p "$ANDROID_ROOT"
-     pushd "$ANDROID_ROOT"
-     #git clone git://github.com/mer-hybris/droid-hal-device rpm || die
-     git clone https://github.com/mer-hybris/droid-hal-device -b hybris-10.1 rpm || die  
-     popd
- else
-     pushd "$ANDROID_ROOT"/rpm
-     git pull
-     popd
-  fi
 fi
