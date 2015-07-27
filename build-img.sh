@@ -12,6 +12,8 @@ source "$TOOLDIR/utility-functions.inc"
 
 source ~/.hadk.env
 [[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+[[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
+
 if repo_is_set "$DHD_REPO"; then
   cd $ANDROID_ROOT
   minfo "Let us start!!!"
@@ -29,11 +31,10 @@ KSFL=$ANDROID_ROOT/tmp/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks
 minfo "Adaptation"
 HA_REPO="repo --name=adaptation0-$DEVICE-@RELEASE@"
 if repo_is_set "$DHD_REPO"; then
-   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install cat /usr/share/kickstarts/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks > $KSFL || die
   minfo "dhd"
-  HA_REPO1="repo --name=adaptation1-$DEVICE-@RELEASE@ --baseurl=${DHD_REPO}"
-  sed -i -e "/^$HA_REPO.*$/a$HA_REPO1" $KSFL
-  sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation=.*$|adaptation=${DHD_REPO}|' /usr/share/ssu/repos.ini" $KSFL
+   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install cat /usr/share/kickstarts/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks > $KSFL || die
+  sed -i "s|^$HA_REPO.*$|$HA_REPO  --baseurl=${DHD_REPO}|" $KSFL
+  sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation0=.*$|adaptation0=${DHD_REPO}|' /usr/share/ssu/repos.ini" $KSFL
 else 
    sed -e "s|^$HA_REPO.*$|$HA_REPO --baseurl=file://$ANDROID_ROOT/droid-local-repo/$DEVICE|" \
     $ANDROID_ROOT/hybris/droid-configs/installroot/usr/share/kickstarts/$(basename $KSFL) > $KSFL
@@ -53,11 +54,16 @@ fi
 minfo "extra packages"
 # Not sure about them, yet... maybe include an external per-device file
 PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar strace"
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout sailfish-weather "
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid "
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus apkenv geoclue-provider-hybris-community"
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout sailfish-weather jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+
+if repo_is_set "$MW_REPO"; then
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid Messwerk"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus apkenv geoclue-provider-hybris-community"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps harbour-sailorgram harbour-mmslog"
+fi
+
 if repo_is_set "$EXTRA_REPO"; then
-   PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste harbour-poor-maps harbour-file-browser less sailfish-utilities jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+   PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-file-browser sailfish-utilities jolla-ambient-z1.5 ambient-icons-closed-z1.5"
 fi
 #PACKAGES_TO_ADD="pulseaudio-modules-droid"
 # jolla-fileman is no longer available starting update13. Download "File Manager" from store instead.
@@ -105,6 +111,8 @@ if repo_is_set "$DHD_REPO" ; then
 else 
  ./hybris/droid-configs/droid-configs-device/helpers/process_patterns.sh || die
 fi
+
+cat $KSFL > ~/a.ks
 mchapter "8.4"
 minfo "create mic"
 # always aim for the latest:
@@ -112,8 +120,7 @@ minfo "create mic"
 #RELEASE=latest
 # WARNING: EXTRA_NAME currently does not support '.' dots in it!
 EXTRA_NAME=-${EXTRA_STRING}-$(date +%Y%m%d%H%M)
-set -x
-sudo mic create fs --arch $ARCH \
+sudo $proxy mic create fs --arch $ARCH \
   --tokenmap=ARCH:$ARCH,RELEASE:$RELEASE,EXTRA_NAME:$EXTRA_NAME \
   --record-pkgs=name,url \
   --outdir=sfa-$DEVICE-$RELEASE$EXTRA_NAME \
