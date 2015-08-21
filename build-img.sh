@@ -34,7 +34,7 @@ if repo_is_set "$DHD_REPO"; then
   minfo "dhd"
    sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install cat /usr/share/kickstarts/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks > $KSFL || die
   sed -i "s|^$HA_REPO.*$|$HA_REPO  --baseurl=${DHD_REPO}|" $KSFL
-  sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation0=.*$|adaptation0=${DHD_REPO}|' /usr/share/ssu/repos.ini" $KSFL
+  sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation=.*$|adaptation=${DHD_REPO}|' /usr/share/ssu/repos.ini" $KSFL
 else 
    sed -e "s|^$HA_REPO.*$|$HA_REPO --baseurl=file://$ANDROID_ROOT/droid-local-repo/$DEVICE|" \
     $ANDROID_ROOT/hybris/droid-configs/installroot/usr/share/kickstarts/$(basename $KSFL) > $KSFL
@@ -48,18 +48,18 @@ if repo_is_set "$EXTRA_REPO"; then
     minfo "add mw repo"
     HA_REPO3="repo --name=extra-$DEVICE-@RELEASE@ --baseurl=${EXTRA_REPO}"
     sed -i -e "/^$HA_REPO.*$/a$HA_REPO3" $KSFL
-    sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation=.*$|adaptation=${EXTRA_REPO}|' /usr/share/ssu/repos.ini" $KSFL
+#    sed -i "/end 70_sdk-domain/a sed -i -e 's|^adaptation=.*$|adaptation=${EXTRA_REPO}|' /usr/share/ssu/repos.ini" $KSFL
 fi
 
 minfo "extra packages"
 # Not sure about them, yet... maybe include an external per-device file
 PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar strace"
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout sailfish-weather jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout jolla-ambient-z1.5 ambient-icons-closed-z1.5"
 
 if repo_is_set "$MW_REPO"; then
   PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid Messwerk"
   PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus apkenv geoclue-provider-hybris-community"
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps harbour-sailorgram harbour-mmslog"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-gpsinfo harbour-poor-maps harbour-sailorgram harbour-mmslog"
 fi
 
 if repo_is_set "$EXTRA_REPO"; then
@@ -100,6 +100,14 @@ if repo_is_set "$EXTRA_REPO"; then
 fi
 sed -i "/begin 60_ssu/a zypper rm jolla-camera jolla-camera-settings" $KSFL
 sed -i "/begin 60_ssu/a ssu dr adaptation0" $KSFL
+sed -i "/begin 60_ssu/a chown -R radio:radio /var/lib/ofono" $KSFL
+sed -i "/begin 60_ssu/a sed -i \"s|\\\$EXPLICIT_BUSYBOX telnetd|#EXPLICIT_BUSYBOX telnetd|g\" /init-debug" $KSFL
+sed -i "/begin 60_ssu/a ln -s /android/media/0/Movies /home/nemo/Videos/Android" $KSFL
+sed -i "/begin 60_ssu/a ln -s /android/media/0/Music /home/nemo/Music/Android" $KSFL
+sed -i "/begin 60_ssu/a ln -s /android/media/0/DCIM /home/nemo/Pictures/Android" $KSFL
+sed -i "/begin 60_ssu/a usermod -aG media_rw nemo" $KSFL
+sed -i "/begin 60_ssu/a mount /dev/mmcblk0p28 /android" $KSFL
+sed -i "/begin 60_ssu/a mkdir /android" $KSFL
 
 #debug merdre
 #sed -i "s/@Jolla Configuration $DEVICE/@jolla-hw-adaptation-$DEVICE/g" $KSFL

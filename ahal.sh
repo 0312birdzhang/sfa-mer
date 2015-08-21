@@ -49,7 +49,7 @@ if repo_is_set "$DHD_REPO"; then
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar dhd-$DEVICE-hal $DHD_REPO
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper clean -a 
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper ref -f
-  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper -n install droid-config-hammerhead-ssu-kickstarts
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper -n install droid-config-$DEVICE-ssu-kickstarts
 else
   if [[ ! -d rpm/dhd ]]; then 
     if [[ -d hybris/dhd2modular ]] ; then 
@@ -63,6 +63,12 @@ else
     fi  
     hybris/dhd2modular/dhd2modular.sh migrate 2>&1 | tee $ANDROID_ROOT/dhd.migrate.log
   fi
+  cp $TOOLDIR/pack-droidmedia.sh $ANDROID_ROOT/
+  cp $TOOLDIR/droidmedia.spec $ANDROID_ROOT/external/droidmedia/rpm/
+  sh  $TOOLDIR/droidmedia.sh
   mkdir -p droid-local-repo/$DEVICE
+  sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/lib/libdroidmedia.so" rpm/dhd/droid-hal-device.inc
+  sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minimediaservice" rpm/dhd/droid-hal-device.inc
+  sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minisfservice" rpm/dhd/droid-hal-device.inc
   rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
 fi

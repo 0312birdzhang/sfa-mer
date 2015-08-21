@@ -12,6 +12,7 @@ source "$TOOLDIR/utility-functions.inc"
 source ~/.hadk.env
 [[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
 minfo "sb2 setup"
+if [[ ! -f $MER_ROOT/tmp/test ]]; then 
 cd "$MER_ROOT"
 
 SFFE_SB2_TARGET="$MER_ROOT/targets/$VENDOR-$DEVICE-$ARCH"
@@ -79,4 +80,8 @@ EOF
 
 sb2 -t $VENDOR-$DEVICE-$ARCH gcc main.c -o test || die "can't compile"
 sb2 -t $VENDOR-$DEVICE-$ARCH ./test || die "can't run"
+else
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  ref --force|| die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  dup|| die
+fi 
 minfo "done sb2 setup"
