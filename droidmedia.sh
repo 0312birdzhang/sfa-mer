@@ -21,9 +21,10 @@ sh pack-droidmedia.sh
     cd $MER_ROOT/devel/droidmedia
     cp $ANDROID_ROOT/${PKG}-* .
     cp $ANDROID_ROOT/external/droidmedia/rpm/$PKG.spec rpm/
+    sed -i "s;armv7hl;$ARCH;g" rpm/$PKG.spec
 
-    echo -e "\e[01;32m Info: mb2 -s rpm/$PKG.spec -t $VENDOR-$DEVICE-armv7hl build &> $PKG.log \e[00m"
-    mb2 -s rpm/$PKG.spec -t $VENDOR-$DEVICE-armv7hl build #&> $ANDROID_ROOT/$PKG.log 
+    echo -e "\e[01;32m Info: mb2 -s rpm/$PKG.spec -t $VENDOR-$DEVICE-$ARCH build &> $PKG.log \e[00m"
+    mb2 -s rpm/$PKG.spec -t $VENDOR-$DEVICE-$ARCH build &> $ANDROID_ROOT/$PKG.log 
     cd $ANDROID_ROOT
     mkdir -p droid-local-repo/$DEVICE
     cp $MER_ROOT/devel/droidmedia/RPMS/*.rpm droid-local-repo/$DEVICE/
