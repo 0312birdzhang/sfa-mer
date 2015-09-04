@@ -11,9 +11,15 @@ source "$TOOLDIR/utility-functions.inc"
 
 source ~/.hadk.env
 [[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
+[[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
 minfo "sb2 setup"
 if [[ ! -f $MER_ROOT/tmp/test ]]; then 
 cd "$MER_ROOT"
+
+    minfo "Work around curl"
+    sudo $proxy zypper rr   curlfix || die
+    sudo $proxy zypper ar -G http://repo.merproject.org/obs/home:/sledge:/mer/latest_i486/  curlfix || die
+    sudo $proxy zypper  dup --from=curlfix|| die
 
 SFFE_SB2_TARGET="$MER_ROOT/targets/$VENDOR-$DEVICE-$ARCH"
 rm -rf $SFFE_SB2_TARGET
@@ -47,7 +53,7 @@ mv ~/.scratchbox2{,-$(date +%d-%m-%Y.%H-%M-%S)}
 
 minfo "chown $SFFE_SB2_TARGET to user"
 [ $(stat -c %u $SFFE_SB2_TARGET ) == $(id -u) ] || sudo chown -R $USER $SFFE_SB2_TARGET
-set -x
+
 cd $SFFE_SB2_TARGET
 grep :$(id -u): etc/passwd || grep :$(id -u): /etc/passwd >> etc/passwd
 grep :$(id -g): etc/group  || grep :$(id -g): /etc/group  >> etc/group
@@ -60,9 +66,8 @@ if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-$ARCH" ] ; then
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R rpm --rebuilddb || die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ar \
         -G http://repo.merproject.org/releases/mer-tools/rolling/builds/$ARCH/packages/ mer-tools-rolling || die
-    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R ssu re $RELEASE || die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  ref --force|| die
-    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  dup|| die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  dup || die
 fi
 
 mkdir -p "$MER_ROOT/tmp"

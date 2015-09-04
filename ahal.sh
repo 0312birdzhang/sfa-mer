@@ -65,10 +65,13 @@ else
   fi
   cp $TOOLDIR/pack-droidmedia.sh $ANDROID_ROOT/
   cp $TOOLDIR/droidmedia.spec $ANDROID_ROOT/external/droidmedia/rpm/
-  sh  $TOOLDIR/droidmedia.sh
+  sh  $TOOLDIR/droidmedia.sh 0.0.0.$(date +%Y%m%d%H%M)
   mkdir -p droid-local-repo/$DEVICE
+  pushd rpm/dhd; git stash; git pull github master; popd
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/lib/libdroidmedia.so" rpm/dhd/droid-hal-device.inc
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minimediaservice" rpm/dhd/droid-hal-device.inc
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minisfservice" rpm/dhd/droid-hal-device.inc
-  rpm/dhd/helpers/build_packages.sh 2>&1 | tee $ANDROID_ROOT/dhd.build.log
+  sed -i "/local_hadk_build_project/d" rpm/droid-hal-hammerhead.spec
+  sed -i "/enable_kernel_update/a %define local_hadk_build_project 1" rpm/droid-hal-hammerhead.spec
+  rpm/dhd/helpers/build_packages.sh 
 fi

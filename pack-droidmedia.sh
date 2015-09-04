@@ -1,4 +1,4 @@
-fold=droidmedia-0.0.0
+fold=droidmedia-$1
 rm -rf $fold
 mkdir $fold
 

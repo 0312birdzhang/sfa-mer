@@ -106,10 +106,10 @@ if repo_is_unset "$DHD_REPO"; then
  #   git cherry-pick ee676296
  # popd
  # cp  ../ubu-July-t15/bionic/libc/bionic/system_properties.c bionic/libc/bionic/system_properties.c 
-  pushd kernel/lge/hammerhead
-    curl -O https://patch-diff.githubusercontent.com/raw/mer-hybris/android_kernel_lge_hammerhead/pull/9.patch
-    patch -p1 < 9.patch
-  popd
+ # pushd kernel/lge/hammerhead
+ #   curl -O https://patch-diff.githubusercontent.com/raw/mer-hybris/android_kernel_lge_hammerhead/pull/9.patch
+ #   patch -p1 < 9.patch
+ # popd
   make -j$JOBS hybris-hal &> make-hybris-hal.stdoe || die_with_log make-hybris-hal.stdoe
 
   CREDITS="$TOOLDIR/device/$VENDOR/$DEVICE-hal-build-credits.inc"
