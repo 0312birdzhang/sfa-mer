@@ -21,9 +21,9 @@ else
   cd $ANDROID_ROOT
   mkdir -p $ANDROID_ROOT/droid-local-repo/$DEVICE || die
   createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE || die
+fi
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref -f || die
   sb2 -t $VENDOR-$DEVICE-$ARCH ssu lr || die
-fi
 mchapter "8.2"
 mkdir -p tmp
 KSFL=$ANDROID_ROOT/tmp/Jolla-@RELEASE@-$DEVICE-@ARCH@.ks
@@ -60,8 +60,12 @@ PACKAGES_TO_ADD="$PACKAGES_TO_ADD voicecall-ui-jolla voicecall-ui-jolla-settings
 
 if repo_is_set "$MW_REPO"; then
   PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid"
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD geoclue-provider-hybris"
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps "
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD geoclue-provider-hybris geoclue-provider-mlsdb geoclue-provider-mlsdb-agreements"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps sailfish-weather"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD sailfish-content-ambiences-default sailfish-content-ambiences-default-default-ambience
+sailfish-content-gallery-configuration-2k sailfish-content-gallery-default sailfish-content-profiled-settings-default
+sailfish-content-tones-default harbour-messwerk harbour-books harbour-communi harbour-sailorgram
+harbour-mmslog harbour-kladi jolla-settings-system-flashlight"
 fi
 
 if repo_is_set "$EXTRA_REPO"; then
