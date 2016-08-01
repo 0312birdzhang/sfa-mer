@@ -44,6 +44,7 @@ if repo_is_set "$MW_REPO"; then
   minfo "Add remote mw repo"
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar mw-$DEVICE-hal $MW_REPO
 fi
+set -x
 if repo_is_set "$DHD_REPO"; then
   minfo "Add remote dhd repo"
   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu ar dhd-$DEVICE-hal $DHD_REPO
@@ -71,7 +72,20 @@ else
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/lib/libdroidmedia.so" rpm/dhd/droid-hal-device.inc
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minimediaservice" rpm/dhd/droid-hal-device.inc
   sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/minisfservice" rpm/dhd/droid-hal-device.inc
+
+  cp $TOOLDIR/pack-audioflingerglue.sh $ANDROID_ROOT/
+  cp $TOOLDIR/audioflingerglue.spec $ANDROID_ROOT/external/audioflingerglue/rpm/
+  sh  $TOOLDIR/af.sh 0.0.1.$(date +%Y%m%d%H%M)
+  sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/lib/libaudioflingerglue.so" rpm/dhd/droid-hal-device.inc
+  sed -i "/rm \-rf \$RPM_BUILD_ROOT$/a rm -f out/target/product/*/system/bin/miniafservice" rpm/dhd/droid-hal-device.inc
+
   sed -i "/local_hadk_build_project/d" rpm/droid-hal-hammerhead.spec
   sed -i "/enable_kernel_update/a %define local_hadk_build_project 1" rpm/droid-hal-hammerhead.spec
   rpm/dhd/helpers/build_packages.sh 
+  pushd $TOOLDIR
+  ./gst-droid.sh
+  ./pulse.sh
+  popd
+createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE
+sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref
 fi

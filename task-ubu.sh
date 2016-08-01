@@ -63,8 +63,14 @@ if repo_is_unset "$DHD_REPO"; then
   fi
   unset DEVICE_SETUP_SCRIPT
   minfo "repo sync -j $JOBS -c &> repo-sync.stdoe"
-  repo sync --fetch-submodules -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
+  repo sync --force-sync --fetch-submodules -j $JOBS -c &> repo-sync.stdoe || die_with_log repo-sync.stdoe
   minfo "done repo sync -c &> repo-sync.stdoe"
+
+#
+#  curl -O https://patch-diff.githubusercontent.com/raw/mer-hybris/android_build/pull/7.diff
+#patch -p1 < 7.diff
+
+#these above may need rebased
 #
   mchapter "5.2"
   minfo "build env, cache and breackfast "
@@ -132,4 +138,8 @@ if repo_is_unset "$DHD_REPO"; then
   make -j$JOBS libdroidmedia >& make-libdroidmedia.log
   make -j$JOBS minimediaservice >& make-minimediaservice.log
   make -j$JOBS minisfservice >& make-minisfservice.log
+  minfo "Do some magic for audio"
+  make -j$JOBS libaudioflingerglue >& libaudioflingerglue.log
+  make -j$JOBS miniafservice >& miniafservice.log
+
 fi

@@ -19,14 +19,14 @@ cd $ANDROID_ROOT
 # .inc file directly, but build-dependencies will be pulled in via
 # zypper, so that the next step has all macro definitions loaded
 
+createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE
+sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref
 
-
-  #sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install ssu rr gst 
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper in "pkgconfig(gstreamer-1.0)" "pkgconfig(gstreamer-base-1.0)" "pkgconfig(gstreamer-video-1.0)" "pkgconfig(gstreamer-plugins-bad-1.0)" "pkgconfig(gstreamer-tag-1.0)" nemo-gstreamer1.0-interfaces-devel "pkgconfig(libexif)"
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install ssu ar gst /home/alin/lavello/NEXUS5/ubu-July-t18c/droid-local-repo/hammerhead 
-  sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref
-    PKG=gst-droid
+   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install ssu rr local 
+   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper  ar local $ANDROID_ROOT/droid-local-repo/$DEVICE
+   sb2 -t $VENDOR-$DEVICE-$ARCH -R -m sdk-install zypper  lr 
+    sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper in audioflingerglue-devel "pkgconfig(libdroid-util)" 
+    PKG=pulseaudio-modules-droid-glue
     echo -e "\e[01;32m Info: build $PKG\e[00m"
     SPEC=$PKG
     mkdir -p $MER_ROOT/devel/mer-hybris
@@ -38,7 +38,7 @@ cd $ANDROID_ROOT
       git pull
     else
       echo -e "\e[01;32m Info: clone the git $PKG\e[00m"
-      git clone https://github.com/sailfishos/$PKG.git
+      git clone https://github.com/mer-hybris/$PKG.git
   #       git clone https://github.com/foolab/$PKG.git 
       #git clone https://github.com/foolab/$PKG.git -b droidmedia
       #git clone https://github.com/foolab/$PKG.git -b caps
@@ -52,4 +52,3 @@ cd $ANDROID_ROOT
     rm -f $ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG/*.rpm
     mv RPMS/*.rpm $ANDROID_ROOT/droid-local-repo/$DEVICE/$PKG
     createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE
-    sb2 -t $VENDOR-$DEVICE-armv7hl -R -msdk-install zypper ref

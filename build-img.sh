@@ -21,7 +21,7 @@ else
   cd $ANDROID_ROOT
   mkdir -p $ANDROID_ROOT/droid-local-repo/$DEVICE || die
   createrepo $ANDROID_ROOT/droid-local-repo/$DEVICE || die
-  sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref || die
+  sb2 -t $VENDOR-$DEVICE-$ARCH -R -msdk-install zypper ref -f || die
   sb2 -t $VENDOR-$DEVICE-$ARCH ssu lr || die
 fi
 mchapter "8.2"
@@ -54,16 +54,25 @@ fi
 minfo "extra packages"
 # Not sure about them, yet... maybe include an external per-device file
 PACKAGES_TO_ADD="sailfish-office jolla-calculator jolla-email jolla-notes jolla-clock jolla-mediaplayer jolla-calendar strace"
-PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD jolla-settings-layout "
+#these shall come from pattern this is a workaround
+PACKAGES_TO_ADD="$PACKAGES_TO_ADD voicecall-ui-jolla voicecall-ui-jolla-settings mms-engine telepathy-ring"
 
 if repo_is_set "$MW_REPO"; then
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid Messwerk"
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-cameraplus geoclue-provider-hybris-community"
-  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps harbour-sailorgram harbour-books"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD gstreamer1.0-droid"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD geoclue-provider-hybris"
+  PACKAGES_TO_ADD="$PACKAGES_TO_ADD susepaste less harbour-poor-maps "
 fi
 
 if repo_is_set "$EXTRA_REPO"; then
-   PACKAGES_TO_ADD="$PACKAGES_TO_ADD harbour-file-browser sailfish-utilities jolla-ambient-z1.5 ambient-icons-closed-z1.5"
+   PACKAGES_TO_ADD="$PACKAGES_TO_ADD sailfish-content-ambiences-default 
+  sailfish-content-ambiences-default-default-ambience sailfish-content-gallery-configuration-2k 
+  sailfish-content-gallery-default sailfish-content-graphics-closed sailfish-content-graphics-closed-z1.0 
+  sailfish-content-graphics-closed-z1.5 sailfish-content-graphics-closed-z1.5-large sailfish-content-graphics-closed-z2.0 
+  sailfish-content-graphics-default sailfish-content-graphics-default-base sailfish-content-graphics-default-z1.0 
+  sailfish-content-graphics-default-z1.0-base sailfish-content-graphics-default-z1.5-base 
+  sailfish-content-graphics-default-z1.5-large-base sailfish-content-graphics-default-z2.0-base 
+  sailfish-content-profiled-settings-default sailfish-content-tones-default"
 fi
 #PACKAGES_TO_ADD="pulseaudio-modules-droid"
 # jolla-fileman is no longer available starting update13. Download "File Manager" from store instead.
@@ -79,11 +88,11 @@ for pack in $PACKAGES_TO_ADD; do
 done
 
 #PACKAGES_TO_REMOVE="ofono-configs-mer ssu-vendor-data-example qtscenegraph-adaptation "
-PACKAGES_TO_REMOVE="jolla-camera jolla-camera-settings"
+PACKAGES_TO_REMOVE=""
 for pack in $PACKAGES_TO_REMOVE; do
   sed -i "/@Jolla\ Configuration\ $DEVICE/a -$pack" $KSFL
 done
-#sed -i "s;@Jolla\ Configuration\ $DEVICE;@jolla-configuration-hammerhead;g" $KSFL
+sed -i "s;@Jolla\ Configuration\ $DEVICE;@jolla-configuration-hammerhead;g" $KSFL
 mchapter "Add adaptation and extra repos in image"
 
 sed -i '/%post --nochroot/a cp $INSTALL_ROOT'//etc//sailfish-release' $IMG_OUT_DIR' $KSFL

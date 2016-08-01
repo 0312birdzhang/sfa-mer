@@ -13,6 +13,7 @@ source ~/.hadk.env
 [[ -f $TOOLDIR/proxy ]] && source $TOOLDIR/proxy
 [[ ! -z  $http_proxy ]] && proxy="http_proxy=$http_proxy"
 minfo "sb2 setup"
+rm -f $MER_ROOT/tmp/test
 if [[ ! -f $MER_ROOT/tmp/test ]]; then 
 cd "$MER_ROOT"
 
@@ -66,6 +67,7 @@ if [ ! x"$(sb2-config -l)" = x"$VENDOR-$DEVICE-$ARCH" ] ; then
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R rpm --rebuilddb || die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper ar \
         -G http://repo.merproject.org/releases/mer-tools/rolling/builds/$ARCH/packages/ mer-tools-rolling || die
+    sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R ssu re $RELEASE || die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  ref --force|| die
     sb2 -t $VENDOR-$DEVICE-$ARCH -m sdk-install -R zypper  dup || die
 fi
