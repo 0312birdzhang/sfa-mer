@@ -1,0 +1,18 @@
+language: bash
+
+sudo: required
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y python3.4 
+  - |
+      if [[ -n "$PYENV_VERSION" ]]; then
+        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+        source setup-pyenv.sh
+      fi
+
+before_script:
+  - mkdir nexus5 && chmod +x *.sh
+
+script:
+  - bash -x ./fullbuild.sh -mer-root nexus5/mer-jan-t2 -android-root nexus5/ubu-jan-t2 -branch hybris-11.0 -device hammerhead -vendor lge -dest nexus5 -sfrelease 1.1.1.27  -extraname alpha5 -jobs 4 -dhdrepo "http://repo.merproject.org/obs/nemo:/devel:/hw:/lge:/hammerhead/sailfish_latest_armv7hl/" -mwrepo "http://repo.merproject.org/obs/nemo:/devel:/hw:/lge:/hammerhead/sailfish_latest_armv7hl/" -extrarepo x -target update10
