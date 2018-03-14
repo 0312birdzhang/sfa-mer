@@ -22,9 +22,9 @@ mkdir -p "$UBUNTU_CHROOT"
 mchapter "4.4.1"
 pushd "$MER_ROOT"
 TARBALL=ubuntu-trusty-android-rootfs.tar.bz2
-[ -f $TARBALL  ] || curl -O http://img.merproject.org/images/mer-hybris/ubu/$TARBALL
+#[ -f $TARBALL  ] || curl -O http://img.merproject.org/images/mer-hybris/ubu/$TARBALL
 minfo "untaring ubuntu..."
-[ -f ${TARBALL}.untarred ] || sudo tar --numeric-owner -xjf $TARBALL -C "$UBUNTU_CHROOT" || die
+[ -f ${TARBALL}.untarred ] || sudo tar --numeric-owner -xjf /root/imgs/$TARBALL -C "$UBUNTU_CHROOT" || die
 touch ${TARBALL}.untarred
 
 mchapter "4.4.2"
